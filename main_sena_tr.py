@@ -546,7 +546,8 @@ def main():
         random_pvalue_file.close()
 
 
-
+if __name__ == "__main__":
+    main()
 
 
 
