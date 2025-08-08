@@ -113,10 +113,10 @@ def read_expression_file(filename, enst2ensg, redundant, verbose=False):
 
     # string biriktirme (ayrı döngü: örnek sıraya göre 3 ondalık)
     for ensg in sorted(rel_enst_express.keys()):
+        rel_enst_express_string[ensg] = {}
         for enst in sorted(rel_enst_express[ensg].keys()):
-            vals = []
-            for sample in sorted(rel_enst_express[ensg][enst].keys()):
-                vals.append(f"{rel_enst_express[ensg][enst][sample]:.3f}")
+            vals = [f"{rel_enst_express[ensg][enst][s]:.3f}"
+                    for s in sorted(rel_enst_express[ensg][enst].keys())]
             rel_enst_express_string[ensg][enst] = " ".join(vals)
 
     return ensg_express, enst_express, rel_enst_express, rel_enst_express_string, all_rel_enst_express
@@ -167,13 +167,16 @@ def read_isoform_int_file(filename, min_string_score):
     Only create miss_int4isoform[ENST] key if there is at least one qualified missed interaction (>= min_string_score).
     Always compute int_n (total qualified STRING interactions) as before.
     """
+    import gzip
     miss_int4isoform = {}
     int_n = {}
     with gzip.open(filename, 'rt') as f:
         for line in f:
-            if not line.startswith('EN'): continue
+            if not line.startswith('EN'):
+                continue
             parts = line.rstrip('\n').split('\t')
-            if len(parts) < 10: continue
+            if len(parts) < 10:
+                continue
             _, _, enst1, _, _, _, _, _, exist_int, miss_int = parts[:10]
             enst1 = enst1.split('.')[0]
             int_n.setdefault(enst1, 0)
@@ -183,7 +186,8 @@ def read_isoform_int_file(filename, min_string_score):
             # missed interactions
             if miss_int:
                 for interaction in miss_int.split(','):
-                    if ':' not in interaction: continue
+                    if ':' not in interaction:
+                        continue
                     int_parts = interaction.split(':')
                     if len(int_parts) >= 8:
                         try:
@@ -197,10 +201,11 @@ def read_isoform_int_file(filename, min_string_score):
                         except Exception:
                             pass
 
-            # existing interactions (only count total STRING int, do not create miss map)
+            # existing interactions (count only)
             if exist_int:
                 for interaction in exist_int.split(','):
-                    if ':' not in interaction: continue
+                    if ':' not in interaction:
+                        continue
                     int_parts = interaction.split(':')
                     if len(int_parts) >= 8:
                         try:
@@ -210,9 +215,10 @@ def read_isoform_int_file(filename, min_string_score):
                         except Exception:
                             pass
 
-            # NOTE: do NOT add empty dict for enst1 if no qualified missed int were found
+            # DİKKAT: Hiç nitelikli missed yoksa enst1 için miss_int4isoform anahtarı OLUŞTURMUYORUZ.
 
     return miss_int4isoform, int_n
+
 
 def median(values):
     if not values: return 0.0
