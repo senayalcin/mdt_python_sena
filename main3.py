@@ -7,7 +7,7 @@ Date:   06.02.2018 (original Perl)
 Purpose:
     Determines cancer-specific MDT based on 2-fold expression difference to
     minor dominant transcripts and compares the relative expression difference
-    to expression differences in GTEx using a Sign-test.
+    to expression differences in GTEx using a Sign-test. SENA YALÇINNNNNNNN
 
 Usage example (PowerShell, single line):
     python3 main3.py \
